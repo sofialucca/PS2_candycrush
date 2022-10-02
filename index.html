@@ -96,7 +96,7 @@ $(document).ready(function()
   rules.prepareNewGame();
   $("#input-move").focus();
   //disable all buttons
-  //$(".btn-move").prop('disabled', true);
+  $(".btn-move").prop('disabled', true);
 });
 
 
@@ -145,27 +145,40 @@ $(document).on('click', "#btn-new", function(evt)
 
 // keyboard events arrive here
 $(document).on('keydown', function(evt) {
-  
+
 });
 
 $(document).on('click', '.btn-move', function(evt)
 {
-  var candyPos = document.getElementById('input-move').value;
-  var candy1 = board.getCandyAt(candyPos[1]-1, LETTERS.indexOf(candyPos[0]))
-  var direction = this.id;
+  let candyPos = document.getElementById('input-move').value;
+  let candy1 = board.getCandyAt(candyPos[1]-1, LETTERS.indexOf(candyPos[0]))
+  let direction = this.id;
   if(rules.isMoveTypeValid(candy1,direction)){
-    var candy2 = board.getCandyInDirection(candy1,direction);
+    let candy2 = board.getCandyInDirection(candy1,direction);
 
     board.flipCandies(candy1,candy2);
   }
   $("#input-move").val("");
   $("#input-move").focus();
+  $(".btn-move").prop('disabled', true);  
 });
 
 //inserted value in input
-$('#input-move').change(function(ev,input){
-
+$(document).on('input', '#input-move',function(evt){
+  let inputText = evt.target.value;
+  if(inputText && /^[a-gA-G][1-8]$/.test(inputText)){
+    inputText = inputText.toLowerCase();
+    let candy = board.getCandyAt(inputText[1]-1, LETTERS.indexOf(inputText[0]));
+    $(".btn-move").each(function(){
+      $(this).prop('disabled', !rules.isMoveTypeValid(candy,$(this).attr('id')));
+    })
+  }else{
+    $(".btn-move").prop('disabled', true);    
+  }
 })
+
+
+
 
 </script>
 
@@ -178,7 +191,7 @@ $('#input-move').change(function(ev,input){
   <div class="row align-items-center justify-content-center">
     <div class="col-md p-0" id="firstColumn">
         <h1 class="font-weight-bold text-danger">Candy Crush</h1>
-        <input id = "btn-new" type ="button" class="btn" value = "New Game"/>
+        <input id = "btn-new" type ="button" class="btn" value = "New Game" />
     </div>
 
     <div class="col-md-6 p-0" id="mainColumn">

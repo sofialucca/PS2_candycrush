@@ -21,6 +21,10 @@
 input:disabled{
   color:rgb(88, 88, 88)  
 }
+.btn-move:enabled{
+  color:black;
+  background-color: green;
+}
 #input-move{
   width:2rem;
   padding-left: 0.5rem;
