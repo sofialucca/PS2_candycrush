@@ -1,6 +1,6 @@
 <!--
 CandyCrush
-Your Name:
+Your Name: Sofia Lucca
 Collaborators:
 -->
 <!DOCTYPE html>
@@ -63,7 +63,7 @@ $.extend({
 
 // constants
 var DEFAULT_BOARD_SIZE = 8;
-var LETTERS = ['a','b','c','d','e','g','f','h'];
+var LETTERS = ['a','b','c','d','e','f','g','h'];
 // data model at global scope for easier debugging
 var board;
 var rules;
@@ -85,15 +85,18 @@ $(document).ready(function()
   var tableBody = document.querySelector('#table-game tbody');
   for (let row=1;row<=DEFAULT_BOARD_SIZE;row++) {
     var newTr = document.createElement("tr");
-    for(let col=0;col<LETTERS.length;col++){
+    for(let col of LETTERS){
       var newTd = document.createElement("td");
-      newTd.textContent = LETTERS[col] + row;
-      newTd.id = (row-1) + "-" + col;
+      newTd.textContent = col + row;
+      newTd.id = col + row;
       newTr.appendChild(newTd);
     }
     tableBody.appendChild(newTr);
   }
   rules.prepareNewGame();
+  $("#input-move").focus();
+  //disable all buttons
+  //$(".btn-move").prop('disabled', true);
 });
 
 
@@ -103,7 +106,7 @@ $(document).ready(function()
 // add a candy to the board
 $(board).on('add', function(e, info)
 {
-  var pos = info.toRow + "-" + info.toCol;
+  var pos = LETTERS[info.toCol] + (info.toRow + 1);
 
   var tableElement = document.getElementById(pos);
   var newStyle = "el-"+info.candy.toString();
@@ -113,7 +116,11 @@ $(board).on('add', function(e, info)
 // move a candy on the board
 $(board).on('move', function(e, info)
 {
-  // Your code here.
+  var pos = LETTERS[info.toCol] + (info.toRow + 1);
+
+  var tableElement = document.getElementById(pos);
+  var newStyle = "el-"+info.candy.toString();
+  tableElement.className = newStyle;  
 });
 
 // remove a candy from the board
@@ -131,16 +138,34 @@ $(board).on('scoreUpdate', function(e, info)
 // Button Events
 $(document).on('click', "#btn-new", function(evt)
 {
-  console.log('click');
   board.clear();
   rules.prepareNewGame();
+  $("#input-move").focus();
 });
 
 // keyboard events arrive here
 $(document).on('keydown', function(evt) {
-  // Your code here.
+  
 });
 
+$(document).on('click', '.btn-move', function(evt)
+{
+  var candyPos = document.getElementById('input-move').value;
+  var candy1 = board.getCandyAt(candyPos[1]-1, LETTERS.indexOf(candyPos[0]))
+  var direction = this.id;
+  if(rules.isMoveTypeValid(candy1,direction)){
+    var candy2 = board.getCandyInDirection(candy1,direction);
+
+    board.flipCandies(candy1,candy2);
+  }
+  $("#input-move").val("");
+  $("#input-move").focus();
+});
+
+//inserted value in input
+$('#input-move').change(function(ev,input){
+
+})
 
 </script>
 
@@ -177,18 +202,18 @@ $(document).on('keydown', function(evt) {
       </div>
 
       <div class = "row justify-content-center" id="btn-up">
-        <input type ="button" class="btn btn-move" value = "up"/>        
+        <input id = 'up' type ="button" class="btn btn-move" value = "up"/>        
       </div>
       <div class = "row justify-content-around py-1">
-        <input type ="button" class="btn btn-move" value = "left" /> 
-        <input type ="button" class="btn btn-move" value = "right"/>         
+        <input id = 'left'  type ="button" class="btn btn-move" value = "left" /> 
+        <input id = 'right' type ="button" class="btn btn-move" value = "right"/>         
       </div>
       <div class = "row justify-content-center">
-        <input type ="button" class="btn btn-move" value = "down"/>         
+        <input id = 'down' type ="button" class="btn btn-move" value = "down"/>         
       </div>
 
       <div class = "row justify-content-center pt-2">
-        <input type ="button" class="btn btn-move" value = "Crush Once"/>         
+        <input type ="button" class="btn btn-crush" value = "Crush Once"/>         
       </div>
     </div>
   </div> <!-- class="row" -->
