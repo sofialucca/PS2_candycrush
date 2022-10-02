@@ -20,6 +20,8 @@ Collaborators:
   "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.css">
 
 <link rel="stylesheet" href="mainLayout.css">
+<!-- For icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 
 <!-- Use mobile-aware viewport -->
 <meta name="viewport" content=
@@ -95,9 +97,21 @@ $(document).ready(function()
   }
   rules.prepareNewGame();
   $("#input-move").focus();
-  //disable all buttons
-  $(".btn-move").prop('disabled', true);
+  
 });
+
+checkInput = function(inputText){
+
+  if(inputText && /^[a-gA-G][1-8]$/.test(inputText)){
+    inputText = inputText.toLowerCase();
+    let candy = board.getCandyAt(inputText[1]-1, LETTERS.indexOf(inputText[0]));
+    $(".btn-move").each(function(){
+      $(this).prop('disabled', !rules.isMoveTypeValid(candy,$(this).attr('id')));
+    })
+  }else{
+    $(".btn-move").prop('disabled', true);    
+  }
+}
 
 
 /* Event Handlers */
@@ -120,13 +134,18 @@ $(board).on('move', function(e, info)
 
   var tableElement = document.getElementById(pos);
   var newStyle = "el-"+info.candy.toString();
-  tableElement.className = newStyle;  
+  tableElement.className = newStyle;
+ 
 });
 
 // remove a candy from the board
 $(board).on('remove', function(e, info)
 {
-  // Your code here.
+  var pos = LETTERS[info.fromCol] + (info.fromRow + 1);
+
+  var tableElement = document.getElementById(pos);
+  var newStyle = "el-empty";
+  tableElement.className = newStyle;
 });
 
 // move a candy on the board
@@ -143,11 +162,6 @@ $(document).on('click', "#btn-new", function(evt)
   $("#input-move").focus();
 });
 
-// keyboard events arrive here
-$(document).on('keydown', function(evt) {
-
-});
-
 $(document).on('click', '.btn-move', function(evt)
 {
   let candyPos = document.getElementById('input-move').value;
@@ -157,24 +171,53 @@ $(document).on('click', '.btn-move', function(evt)
     let candy2 = board.getCandyInDirection(candy1,direction);
 
     board.flipCandies(candy1,candy2);
+
   }
+
+  $(".btn-move").prop('disabled', true);
   $("#input-move").val("");
-  $("#input-move").focus();
-  $(".btn-move").prop('disabled', true);  
+    //set crushable
+  if(rules.getCandyCrushes().length >0){
+      $("#btn-crush").prop('disabled', false); 
+      //TODO check prof response
+      $('#input-move').prop('disabled', true);
+  }else{
+    $("#btn-crush").prop('disabled', true);
+    
+    $("#input-move").focus();      
+  }   
 });
+
+$(document).on('click', "#btn-crush", function(evt)
+{
+  let crushableCandies = rules.getCandyCrushes();
+  rules.removeCrushes(crushableCandies);
+
+  $(".btn-move").prop('disabled',true);
+  setTimeout(()=>{
+    rules.moveCandiesDown();
+
+    if(rules.getCandyCrushes().length == 0){
+      $("#btn-crush").prop('disabled', true);
+      $('#input-move').prop('disabled', false);
+      $('#input-move').focus();
+      //TODO if disabled input remove function
+      checkInput(document.getElementById('input-move').value);
+    }
+    
+  },500);
+})
+
+// keyboard events arrive here
+$(document).on('keydown', function(evt) {
+
+});
+
+
 
 //inserted value in input
 $(document).on('input', '#input-move',function(evt){
-  let inputText = evt.target.value;
-  if(inputText && /^[a-gA-G][1-8]$/.test(inputText)){
-    inputText = inputText.toLowerCase();
-    let candy = board.getCandyAt(inputText[1]-1, LETTERS.indexOf(inputText[0]));
-    $(".btn-move").each(function(){
-      $(this).prop('disabled', !rules.isMoveTypeValid(candy,$(this).attr('id')));
-    })
-  }else{
-    $(".btn-move").prop('disabled', true);    
-  }
+  checkInput(evt.target.value);
 })
 
 
@@ -190,7 +233,7 @@ $(document).on('input', '#input-move',function(evt){
 <div class="container text-center">
   <div class="row align-items-center justify-content-center">
     <div class="col-md p-0" id="firstColumn">
-        <h1 class="font-weight-bold text-danger">Candy Crush</h1>
+        <h1 id = 'title-game'>Candy Crush</h1>
         <input id = "btn-new" type ="button" class="btn" value = "New Game" />
     </div>
 
@@ -209,24 +252,32 @@ $(document).on('input', '#input-move',function(evt){
       <div class = "row justify-content-center">
         <form>
           <label for = "input-move" class="font-weight-bold " id ="label-move">Move: </label>
-          <input type ="text" id = "input-move" maxlength="2"/>
+          <input type ="text" id = "input-move" maxlength="2" />
         </form>
         
       </div>
 
       <div class = "row justify-content-center" id="btn-up">
-        <input id = 'up' type ="button" class="btn btn-move" value = "up"/>        
+        <button id = 'up'  class="btn btn-move" disabled>
+          <i class="bi bi-arrow-up"></i>
+        </button>
       </div>
       <div class = "row justify-content-around py-1">
-        <input id = 'left'  type ="button" class="btn btn-move" value = "left" /> 
-        <input id = 'right' type ="button" class="btn btn-move" value = "right"/>         
+        <button id = 'left'  class="btn btn-move" disabled>
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <button id = 'right'  class="btn btn-move" disabled>
+          <i class="bi bi-arrow-right"></i>
+        </button>
       </div>
       <div class = "row justify-content-center">
-        <input id = 'down' type ="button" class="btn btn-move" value = "down"/>         
+        <button id = 'down'  class="btn btn-move" disabled>
+          <i class="bi bi-arrow-down"></i>
+        </button>
       </div>
 
       <div class = "row justify-content-center pt-2">
-        <input type ="button" class="btn btn-crush" value = "Crush Once"/>         
+        <input type ="button" class="btn" id ="btn-crush" value = "Crush Once" disabled/>         
       </div>
     </div>
   </div> <!-- class="row" -->

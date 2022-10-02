@@ -14,16 +14,31 @@
   margin-top:1rem;
   padding: 0.5rem 1.5rem;
 }
+
+#title-game{
+  color:red;
+  font-weight:bold;
+  font-variant: small-caps;
+
+}
 .btn{
   background-color: rgba(150, 150, 150, 0.753);
 }
 
-input:disabled{
+input:disabled,
+input:disabled i{
   color:rgb(88, 88, 88)  
 }
 .btn-move:enabled{
   color:black;
   background-color: green;
+}
+.btn-move:enabled i{
+  color:black;  
+}
+#btn-crush:enabled{
+  color:white;
+  background-color: blueviolet;
 }
 #input-move{
   width:2rem;
@@ -32,16 +47,7 @@ input:disabled{
 #label-move{
   font-size: 1.25rem;
 }
-/*
-.btn-move{
-  background-color: rgb(206, 205, 205);
-  color:rgb(88, 88, 88)
-}
-.btn-move:hover,
-.btn-move:focus{
-  background-color: green;
-  color: black;
-}*/
+
 #table-game{
   table-layout: fixed;
   width:320px;
@@ -75,4 +81,8 @@ td{
 }
 .el-purple{
   background-color: purple;
+}
+.el-empty{
+  background-color: white;
+  color:black;
 }
