@@ -3,6 +3,11 @@
  */
 
 /* REMOVE ME - dashed lines and height for debugging */
+body,
+.row-container,
+.main-container{
+  min-height: 100vh;
+}
 #mainColumn {
   margin: 10px;
 }
