@@ -5,7 +5,7 @@ Collaborators: No collaborators
 -->
 <!--
 I implemented the application with some extra features:
--can add name for user
+-can add name for user and modify it by clicking on text field again
 -keep track of the score
 -can start a new game with "n" pressing
 -can execute crash with space button
@@ -161,7 +161,7 @@ $(board).on('remove', function(e, info)
 $(board).on('scoreUpdate', function(e, info)
 {
   document.getElementById("score-points").textContent = info.score;
-  // Your code here. To be implemented in pset 2.
+  
 });
 
 // Button Events
@@ -169,7 +169,7 @@ $(document).on('click', "#btn-new", function(evt)
 {
   board.clear();
   rules.prepareNewGame();
-
+  board.resetScore()
   
   $(".btn-move").prop('disabled', true);  
   $("#btn-crush").prop('disabled', true);  
@@ -177,7 +177,7 @@ $(document).on('click', "#btn-new", function(evt)
   $("#input-move").focus(); 
 
   $("#input-move").val("");
-  document.getElementById("score-points").textContent = 0;
+  
 });
 
 $(document).on('click', '.btn-move', function(evt)
@@ -233,7 +233,7 @@ $(document).on('click', "#btn-crush", function(evt)
 // keyboard events arrive here
 $(document).on('keydown', function(evt) {
   
-  if((evt.target != document.getElementById('input-move') && evt.target != document.getElementById('name-player'))){
+  if((evt.target != document.getElementById('input-move') && evt.target != document.getElementById('name-player-input'))){
     let inputKey = String.fromCharCode(evt.keyCode).toLowerCase();
 
     if(inputKey == " "){
@@ -247,14 +247,15 @@ $(document).on('keydown', function(evt) {
 
 
 
+
 //inserted value in input
 $(document).on('input', '#input-move',function(evt){
-  console.log(evt);
-  if(evt.target.value != "n" && evt.target.value != " " ){
+  let val = evt.target.value.toLowerCase();
+  if(val != "n" && val != " " ){
     
-    checkInput(evt.target.value);
+    checkInput(val);
   }else{
-    if(evt.target.value == "n"){
+    if(val == "n"){
       $("#btn-new").trigger("click");
     }
     evt.target.value = "";
@@ -262,7 +263,23 @@ $(document).on('input', '#input-move',function(evt){
   
 })
 
+$(document).on('change', '#name-player-input',function(evt){
+  let val = evt.target.value;
+  if(val == "" ){
+    val = "Anonymous";
+  }
+  document.getElementById("name-player").textContent = val;
+  document.getElementById("name-player").hidden =false;
+  $("#name-player-input").hide();
+  
+  
+})
 
+$(document).on('click', '#name-player',function(evt){
+
+  $("#name-player-input").show();
+  document.getElementById("name-player").hidden =true;
+})
 
 
 </script>
@@ -283,7 +300,8 @@ $(document).on('input', '#input-move',function(evt){
 
     <div class="col-md-6 p-0" id="mainColumn">
       <div class="font-weight-bold pb-3" id = "name-player-container">
-        Player: <input class = "text-center font-italic font-weight-normal" type ="text" id = "name-player" placeholder="Anonymous"/>
+        Player: <input class = "text-center font-italic font-weight-normal" type ="text" id = "name-player-input" placeholder="Anonymous"/>
+        <span class = "font-italic font-weight-normal" hidden id = "name-player"></span>
       </div>
       <table id = "table-game" >
         <tbody >        
